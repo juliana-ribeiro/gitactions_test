@@ -1,0 +1,32 @@
+name: Comparar GICode
+
+on:
+  workflow_dispatch:     # execução manual
+
+jobs:
+  comparar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependências
+        run: |
+          pip install pandas openpyxl
+
+      - name: Executar script de comparação
+        run: python comparar.py
+
+      - name: Upload dos arquivos de resultado
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-comparacao
+          path: |
+            *.txt
+
