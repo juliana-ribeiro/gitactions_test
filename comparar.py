@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Carregar o Excel
-df = pd.read_excel("mock_gicode_comparacao.xlsx")
+df = pd.read_excel("mock_gicode.xlsx")
 
 # Comparação
 df['iguais'] = df['gicode jira'] == df['gicode feed']
