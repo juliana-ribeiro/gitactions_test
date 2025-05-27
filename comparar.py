@@ -3,32 +3,23 @@ import pandas as pd
 # Carregar o Excel
 df = pd.read_excel("mock_gicode.xlsx")
 
-# Comparação
-df['iguais'] = df['gicode jira'] == df['gicode feed']
-df['ambos vazios'] = df[['gicode jira', 'gicode feed']].isnull().all(axis=1)
-df['um vazio'] = df[['gicode jira', 'gicode feed']].isnull().any(axis=1) & ~df['ambos vazios']
+# Selecionar as colunas relevantes
+df = df[['name', 'gicode jira', 'gicode feed']]
 
-# Conjuntos únicos
-jira_set = set(df['gicode jira'].dropna())
-feed_set = set(df['gicode feed'].dropna())
+# Identificar condições específicas
+cond_iguais = (df['gicode jira'] == df['gicode feed']) & df['gicode jira'].notna()
+cond_vazios = df['gicode jira'].isna() & df['gicode feed'].isna()
+cond_diferentes = ~cond_iguais & ~cond_vazios  # inclui qualquer um nulo ou diferentes
 
-so_jira = jira_set - feed_set
-so_feed = feed_set - jira_set
-iguais = jira_set & feed_set
+# Filtrar DataFrames
+df_iguais = df[cond_iguais]
+df_vazios = df[cond_vazios]
+df_diferentes = df[cond_diferentes]
 
-# Salvar resultados em arquivos .txt
-with open("valores_iguais.txt", "w") as f:
-    f.write("\n".join(sorted(iguais)))
+# Salvar em arquivos .txt (somente valores, sem cabeçalhos)
+df_iguais.to_csv("iguais.txt", sep='\t', index=False, header=False)
+df_vazios.to_csv("vazios.txt", sep='\t', index=False, header=False)
+df_diferentes.to_csv("diferentes.txt", sep='\t', index=False, header=False)
 
-with open("so_no_jira.txt", "w") as f:
-    f.write("\n".join(sorted(so_jira)))
-
-with open("so_no_feed.txt", "w") as f:
-    f.write("\n".join(sorted(so_feed)))
-
-df[df['iguais'] == True].to_string("linhas_iguais.txt", index=False)
-df[df['iguais'] == False].to_string("linhas_diferentes.txt", index=False)
-df[df['um vazio'] == True].to_string("linhas_vazias.txt", index=False)
-
-print("Arquivos .txt criados com sucesso!")
+print("Arquivos 'iguais.txt', 'vazios.txt' e 'diferentes.txt' criados com sucesso.")
 
