@@ -24,7 +24,7 @@ jobs:
         run: python comparar.py
 
       - name: Upload dos arquivos de resultado
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: resultados-comparacao
           path: |
